@@ -52,7 +52,20 @@ app.put('/tasks/:id', (req, res) => {
   task.description = req.body.description;
   task.completed = req.body.completed;
 
-  return res.json(task);
+  return res.status(200).send({ message: 'Task atualizada' });
+})
+
+app.delete('/tasks/:id', (req, res) => {
+  const id: number = Number(req.params.id);
+  const taskIndex = tasks.findIndex((e) => e.id === id);
+
+  if(taskIndex === -1) {
+    return res.status(404).json( { message: "404: Task not found" } );
+  }
+
+  tasks.splice(taskIndex, 1);
+
+  return res.status(200).send({ message: 'Task deletada' });
 })
 
 app.listen(3000, () => {
