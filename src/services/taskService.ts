@@ -3,7 +3,7 @@ import type { Tasks } from '../models/taskModel.js';
 const tasks: Tasks[] = [];
 
 class TaskService {
-  create({ title, description }: Tasks) {
+  create({ title, description }: Omit<Tasks, 'id' | 'completed'>) {
     if (!title) {
       throw new Error("Tarefa deve haver título");
     }
@@ -43,8 +43,13 @@ class TaskService {
     return task;
   }
 
-  update(id: number, data: Tasks) {
-    const task = this.listById(id);
+  update(id: number, data: Partial<Tasks>) {
+    const task = tasks.find((e) => e.id === id);
+
+    if(!task) {
+      throw new Error("404: Task not found");
+    }
+
 
     task.title = data.title ?? task.title;
     task.description = data.description ?? task.description;
