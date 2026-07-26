@@ -22,21 +22,35 @@ app.post('/tasks', (req, res) => {
   };
   tasks.push(newTask);
 
-  return res.status(201).send( { message: 'Task enviada' });
+  return res.status(201).send({ message: 'Task enviada' });
 })
 
 app.get('/tasks', (req, res) => {
-  res.status(200).json( tasks );
+  res.status(200).json(tasks);
 });
 
 app.get('/tasks/:id', (req, res) => {
   const id: number = Number(req.params.id);
-
   const task = tasks.find((e) => e.id === id);
 
   if(!task) {
     return res.status(404).json( { message: "404: Task not found" } );
   }
+
+  return res.json(task);
+})
+
+app.put('/tasks/:id', (req, res) => {
+  const id: number = Number(req.params.id);
+  const task = tasks.find((e) => e.id === id);
+
+  if(!task) {
+    return res.status(404).json( { message: "404: Task not found" } );
+  }
+
+  task.title = req.body.title;
+  task.description = req.body.description;
+  task.completed = req.body.completed;
 
   return res.json(task);
 })
