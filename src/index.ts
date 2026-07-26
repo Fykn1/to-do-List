@@ -1,4 +1,5 @@
 import express from 'express';
+import { resourceUsage } from 'node:process';
 
 const app = express();
 
@@ -26,7 +27,18 @@ app.post('/tasks', (req, res) => {
 })
 
 app.get('/tasks', (req, res) => {
-  res.status(200).json(tasks);
+  const completed = req.query.completed;
+  let result = tasks;
+
+  if (completed !== undefined) {
+    if (completed === "false") {
+      result = result.filter((task) => task.completed === false);
+    } else {
+      result = result.filter((task) => task.completed === true);
+    }
+  }
+
+  res.status(200).json(result);
 });
 
 app.get('/tasks/:id', (req, res) => {
@@ -34,7 +46,7 @@ app.get('/tasks/:id', (req, res) => {
   const task = tasks.find((e) => e.id === id);
 
   if(!task) {
-    return res.status(404).json( { message: "404: Task not found" } );
+    return res.status(404).json({ message: "404: Task not found" });
   }
 
   return res.json(task);
@@ -45,7 +57,7 @@ app.put('/tasks/:id', (req, res) => {
   const task = tasks.find((e) => e.id === id);
 
   if(!task) {
-    return res.status(404).json( { message: "404: Task not found" } );
+    return res.status(404).json({ message: "404: Task not found" });
   }
 
   task.title = req.body.title;
@@ -60,7 +72,7 @@ app.delete('/tasks/:id', (req, res) => {
   const taskIndex = tasks.findIndex((e) => e.id === id);
 
   if(taskIndex === -1) {
-    return res.status(404).json( { message: "404: Task not found" } );
+    return res.status(404).json({ message: "404: Task not found" });
   }
 
   tasks.splice(taskIndex, 1);
