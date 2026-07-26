@@ -1,14 +1,7 @@
 import express from 'express';
-import { resourceUsage } from 'node:process';
+import type { Tasks } from './models/taskModel.js';
 
 const app = express();
-
-interface Tasks {
-  id: number,
-  title: string,
-  description: string,
-  completed: boolean
-}
 
 const tasks: Tasks[] = [];
 
@@ -27,9 +20,9 @@ app.post('/tasks', (req, res) => {
 })
 
 app.get('/tasks', (req, res) => {
-  const completed = req.query.completed;
   let result = tasks;
 
+  const completed = req.query.completed;
   if (completed !== undefined) {
     if (completed === "false") {
       result = result.filter((task) => task.completed === false);
