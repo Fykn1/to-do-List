@@ -31,29 +31,38 @@ class TaskService {
     })
   }
 
-  getById(id: number) {
-    const task = tasks.find((e) => e.id === id);
+  async getById(id: number) {
+    const task = await prisma.task.findUnique({
+      where: { id }
+    });
 
-    if(!task) {
+    if (!task) {
       throw new Error("404: Task not found");
     }
 
     return task;
   }
 
-  update(id: number, data: Partial<Tasks>) {
-    const task = tasks.find((e) => e.id === id);
+  async update(id: number, data: Partial<Tasks>) {
+    try {
+      const task = await prisma.task.update({
+        where: { id },
+        data: {
+        ...(data.title !== undefined && { title: data.title }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.completed !== undefined && { completed: data.completed })
+      }
+      })
 
-    if(!task) {
-      throw new Error("404: Task not found");
+      return task;
+    
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new Error('404: Task not found');
+      }
+      
+      throw error;
     }
-
-
-    task.title = data.title ?? task.title;
-    task.description = data.description ?? task.description;
-    task.completed = data.completed ?? task.completed;
-
-    return task;
   }
 
   async delete(id: number) {
