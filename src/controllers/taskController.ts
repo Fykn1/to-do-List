@@ -4,10 +4,10 @@ import { TaskService } from '../services/taskService.js';
 const service = new TaskService();
 
 class TaskController {
-  create(req: Request, res: Response) {
+  async create(req: Request, res: Response) {
     try {
       const { title, description } = req.body;
-      const task = service.create({ title, description });
+      const task = await service.create({ title, description });
       
       return res.status(201).json(task);
       
@@ -16,10 +16,10 @@ class TaskController {
     }
   }
 
-  list(req: Request, res: Response) {
+  async getAll(req: Request, res: Response) {
     try {
       const completed = req.query.completed as string | undefined;
-      const tasks = service.list(completed);
+      const tasks = await service.getAll(completed);
 
       return res.status(200).json(tasks);
     
@@ -28,10 +28,10 @@ class TaskController {
     }
   }
 
-  listById(req: Request, res: Response) {
+  async getById(req: Request, res: Response) {
     try {
       const id: number = Number(req.params.id);
-      const task = service.listById(id);
+      const task = await service.getById(id);
 
       return res.json(task);
     
@@ -40,10 +40,10 @@ class TaskController {
     }
   }
 
-  update(req: Request, res: Response) {
+  async update(req: Request, res: Response) {
     try {
       const id: number = Number(req.params.id);
-      const updatedTask = service.update(id, req.body);
+      const updatedTask = await service.update(id, req.body);
 
       return res.status(200).json(updatedTask);
     
@@ -52,10 +52,10 @@ class TaskController {
     }
   }
 
-  delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response) {
     try {
       const id: number = Number(req.params.id);
-      service.delete(id);
+      await service.delete(id);
       
       return res.status(204).send();
     
