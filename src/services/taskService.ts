@@ -60,7 +60,7 @@ class TaskService {
       if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
         throw new Error('404: Task not found');
       }
-      
+
       throw error;
     }
   }
@@ -71,7 +71,7 @@ class TaskService {
     
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
-        throw new Error('Tarefa não encontrada.');
+        throw new Error('404: Task not found');
       }
       throw error;
     } 
