@@ -19,18 +19,16 @@ class TaskService {
     return newTask;
   }
 
-  getAll(completed?: string) {
-    let result = tasks;
+  async getAll(completed?: string) {
+    const where: { completed?: boolean } = {};
 
     if (completed !== undefined) {
-      if (completed === "false") {
-        result = result.filter((task) => task.completed === false);
-      } else {
-        result = result.filter((task) => task.completed === true);
-      }
+      where.completed = completed === 'true';
     }
     
-    return result;
+    return await prisma.task.findMany({
+      where
+    })
   }
 
   getById(id: number) {
