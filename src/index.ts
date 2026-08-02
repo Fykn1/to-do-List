@@ -1,7 +1,7 @@
 import express from 'express';
 import { taskRoutes } from './routes/taskRoute.js';
+import { app } from './config/expressConfig';
 
-const app = express();
 const PORT = 3333;
 
 app.use(express.json());
