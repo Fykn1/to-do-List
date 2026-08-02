@@ -1,25 +1,25 @@
+import { prisma } from '../config/prismaClient.js';
 import type { Tasks } from '../models/taskModel.js';
-
-const tasks: Tasks[] = [];
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 class TaskService {
-  create({ title, description }: Omit<Tasks, 'id' | 'completed'>) {
+  async create({ title, description }: Omit<Tasks, 'id' | 'completed'>) {
     if (!title) {
       throw new Error("Tarefa deve haver título");
     }
 
-    const newTask = { 
-      id: Math.floor(Math.random() * 100), 
-      title, 
-      description,
-      completed: false 
-    };
+    const newTask = await prisma.task.create({
+      data: { 
+        title, 
+        description,
+        completed: false 
+      }
+    });
 
-    tasks.push(newTask);
     return newTask;
   }
 
-  list(completed?: string) {
+  getAll(completed?: string) {
     let result = tasks;
 
     if (completed !== undefined) {
@@ -33,7 +33,7 @@ class TaskService {
     return result;
   }
 
-  listById(id: number) {
+  getById(id: number) {
     const task = tasks.find((e) => e.id === id);
 
     if(!task) {
@@ -58,14 +58,16 @@ class TaskService {
     return task;
   }
 
-  delete(id: number) {
-    const taskIndex = tasks.findIndex((e) => e.id === id);
-
-    if(taskIndex === -1) {
-      throw new Error("404: Task not found");
-    }
-
-    tasks.splice(taskIndex, 1);
+  async delete(id: number) {
+    try {
+      await prisma.task.delete({ where: { id } });
+    
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new Error('Tarefa não encontrada.');
+      }
+      throw error;
+    } 
   }
 }
 
